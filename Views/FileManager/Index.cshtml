@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Files</title>
+    <link rel="icon"
+        href="https://cdn.icon-icons.com/icons2/2963/PNG/512/macos_big_sur_download_folder_icon_186042.png">
+    <link rel="stylesheet" href="">
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
+    <script src="~/lib/elfinder/js/elfinder.min.js"></script>
+    <link rel="stylesheet" href="~/lib/jqueryui/themes/base/theme.css" />
+    <link rel="stylesheet" href="~/lib/jqueryui/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="~/lib/elfinder/css/elfinder.full.css" />
+    <link rel="stylesheet" href="~/lib/elfinder/css/theme.min.css" />
+
+
+
+</head>
+
+<body>
+    <div id="elfinder"></div>
+</body>
+
+</html>
+
+
+<script type="text/javascript">
+    // Documentation for client options:
+    // https://github.com/Studio-42/elFinder/wiki/Client-configuration-options
+    $(document).ready(function () {
+        var myCommands = elFinder.prototype._options.commands;
+
+        // Not yet implemented commands in elFinder.NetCore
+        var disabled = ['callback', 'chmod', 'editor', 'netmount', 'ping', 'search', 'zipdl', 'help'];
+        elFinder.prototype.i18.en.messages.TextArea = "Edit";
+
+        $.each(disabled, function (i, cmd) {
+            (idx = $.inArray(cmd, myCommands)) !== -1 && myCommands.splice(idx, 1);
+        });
+
+        var options = {
+            baseUrl: "/lib/elfinder/",
+            url: "/el-finder-file-system/connector",
+            rememberLastDir: false,
+            commands: myCommands,
+            lang: 'vi',
+            height: "100%",
+            uiOptions: {
+                toolbar: [
+                    ['back', 'forward'],
+                    ['reload'],
+                    ['home', 'up'],
+                    ['mkdir', 'mkfile', 'upload'],
+                    ['open', 'download'],
+                    ['undo', 'redo'],
+                    ['info'],
+                    ['quicklook'],
+                    ['copy', 'cut', 'paste'],
+                    ['rm'],
+                    ['duplicate', 'rename', 'edit'],
+                    ['selectall', 'selectnone', 'selectinvert'],
+                    ['view', 'sort']
+                ]
+            },
+            //onlyMimes: ["image", "text/plain"] // Get files of requested mime types only
+            lang: 'vi',
+        };
+        $('#elfinder').elfinder(options).elfinder('instance');
+    });
+</script>

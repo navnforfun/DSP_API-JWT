@@ -12,3 +12,5 @@ cau hinh san route o 1 lop roi ke thua
 # An action
 [ApiExplorerSettings(IgnoreApi = true)] : an api nhung van co the truy cap qua link ()
 private : an 100%
+
+<!--  start use jwt -->

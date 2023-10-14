@@ -1,7 +1,10 @@
+using System.Text;
 using System.Text.Json.Serialization;
 using DSP_API.Models.Entity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +35,20 @@ builder.Services.AddDbContext<DspApiContext>(o =>
 });
 
 
+//config jwt
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 // add session
 
 builder.Services.AddDistributedMemoryCache();
@@ -74,6 +91,9 @@ app.UseSession();
 
 
 app.UseHttpsRedirection();
+
+// jwt
+app.UseAuthentication();
 
 app.UseAuthorization();
 

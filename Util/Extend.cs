@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.RegularExpressions;
 
 namespace App
@@ -38,18 +39,48 @@ namespace App
             // Compare a string against the regular expression
             return regex.IsMatch(email);
         }
-        public static string Random(int n){
-              Random rd = new Random();
-               const string allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789";
-               char[] chars = new char[n];
+        public static string Random(int n)
+        {
+            Random rd = new Random();
+            const string allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789";
+            char[] chars = new char[n];
 
-               for (int i = 0; i < n; i++)
-               {
-                    chars[i] = allowedChars[rd.Next(0, allowedChars.Length)];
-               }
-               string kq = new string(chars);
-               return kq;
+            for (int i = 0; i < n; i++)
+            {
+                chars[i] = allowedChars[rd.Next(0, allowedChars.Length)];
+            }
+            string kq = new string(chars);
+            return kq;
         }
+        public static long GetTokenExpirationTime(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtSecurityToken = handler.ReadJwtToken(token);
+            var tokenExp = jwtSecurityToken.Claims.First(claim => claim.Type.Equals("exp")).Value;
+            var ticks = long.Parse(tokenExp);
+            return ticks;
+        }
+
+        public static bool CheckTokenIsValid(string token)
+        {
+            try
+            {
+                var tokenTicks = GetTokenExpirationTime(token);
+                var tokenDate = DateTimeOffset.FromUnixTimeSeconds(tokenTicks).UtcDateTime;
+
+                var now = DateTime.Now.ToUniversalTime();
+
+                var valid = tokenDate >= now;
+
+                return valid;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
 
 
 

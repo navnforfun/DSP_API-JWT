@@ -7,10 +7,6 @@ public partial class Vote
 {
     public int Id { get; set; }
 
-    public int? Status { get; set; }
-
-    public DateTime? DateCreated { get; set; }
-
     public int BoxId { get; set; }
 
     public int UserId { get; set; }

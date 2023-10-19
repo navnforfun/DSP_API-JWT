@@ -160,7 +160,7 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. Box is not available");
             }
-            var listFile = _context.Files.Where(f => f.BoxId == boxId).Select(lf => new{lf.Id,lf.Name,lf.Size,lf.View});
+            var listFile = _context.Files.Where(f => f.BoxId == boxId).Select(lf => new { lf.Id, lf.Name, lf.Size, lf.View });
             return Ok(listFile);
         }
         [HttpGet]
@@ -341,13 +341,14 @@ namespace DSP_API.Controllers
         [SwaggerOperation(Summary = "Get list user have been share to the box ")]
         public async Task<IActionResult> GetUserShareInBox(int boxId)
         {
-            
+
             var box = await _context.Boxs.Where(b => b.Id == boxId).Include(b => b.Users).FirstOrDefaultAsync();
             if (box == null)
             {
                 return BadRequest("0. box is null");
             }
-            if(box.UserId != _UserId){
+            if (box.UserId != _UserId)
+            {
                 return BadRequest("0. You have not permission");
             }
             var listUserShare = box.Users.Select(u => new { u.Id, u.Username, u.Img, u.Name }).ToList();
@@ -359,9 +360,9 @@ namespace DSP_API.Controllers
         [SwaggerOperation(Summary = "Get list box have been share to the User")]
         public async Task<IActionResult> GetBoxShareCurrentUser()
         {
-           
+
             var user = await _context.Users.Where(u => u.Id == _UserId).Include(u => u.BoxesNavigation).FirstOrDefaultAsync();
-            var listBoxShare = user.BoxesNavigation.Select(bn => new {bn.Id,bn.Title,bn.Content,bn.Img,bn.IsAvailable,bn.AdminBan,bn.DateCreated,bn.View,bn.Url});
+            var listBoxShare = user.BoxesNavigation.Select(bn => new { bn.Id, bn.Title, bn.Content, bn.Img, bn.IsAvailable, bn.AdminBan, bn.DateCreated, bn.View, bn.Url });
             return Ok(listBoxShare);
         }
         [HttpPost]
@@ -430,6 +431,16 @@ namespace DSP_API.Controllers
         {
             foreach (System.IO.FileInfo file in directory.GetFiles()) file.Delete();
             foreach (System.IO.DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
+        }
+
+       
+        private bool IsAuth(int possession)
+        {
+            if (possession == _UserId)
+            {
+                return true;
+            }
+            return false;
         }
     }
     public class BoxCreate

@@ -57,13 +57,6 @@ namespace DSP_API.Util
                 HttpContext.Session.SetInt32("UserId", value);
             }
         }
-        public bool _IsLogin
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(_Username);
-            }
-        }
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             base.OnActionExecuted(context);

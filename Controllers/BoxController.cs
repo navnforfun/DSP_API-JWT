@@ -47,8 +47,7 @@ namespace DSP_API.Controllers
             {
                 Title = boxCreate.Title,
                 Content = boxCreate.Content,
-                Pass = boxCreate.Pass,
-                IsAvailable = boxCreate.IsAvailable,
+                SharedStatus = boxCreate.SharedStatus,
                 UserId = _UserId,
                 DateCreated = DateTime.Now,
                 View = 0,
@@ -78,6 +77,9 @@ namespace DSP_API.Controllers
         public async Task<IActionResult> GetDetailBox(int boxId, string? pass)
         {
             var box = await _context.Boxs.FirstOrDefaultAsync(b => b.Id == boxId);
+            box.View++;
+            _context.Update(box);
+            await _context.SaveChangesAsync();
             if (box == null)
             {
                 return BadRequest("Box is not exists");
@@ -86,17 +88,16 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. The box id baned by admin");
             }
-            if (box.IsAvailable == false)
+            if (box.SharedStatus == false)
             {
-                return BadRequest("0. The box is not available");
-            }
-            if (!string.IsNullOrEmpty(box.Pass))
-            {
-                if (box.Pass != pass)
+                var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId).ToArray();
+                if (!listUserShare.Contains(_UserId) && !(box.UserId == _UserId))
                 {
-                    return BadRequest("0. Missing pass");
+                    return BadRequest("0. The box is not available");
+
                 }
             }
+
             return Ok(box);
         }
         [HttpPut]
@@ -112,12 +113,18 @@ namespace DSP_API.Controllers
                 return BadRequest("0. The box is not exists");
             }
 
-            var listUserShare = updateBox.Users.Select(u => new { u.Id, u.Username, u.Img, u.Name }).ToList();
-            if (updateBox.UserId != _UserId && !listUserShare.Any(l => l.Id == _UserId) && !_UserRole.Contains("Edit"))
+            if (updateBox.UserId != _UserId)
             {
-                return BadRequest("0. You have not permission");
+                var userShare = await _context.BoxShares.FirstOrDefaultAsync(b => b.BoxId == updateBox.Id && b.UserId == _UserId);
+                if (userShare == null)
+                {
+                    return BadRequest("You have not permission");
+                }
+                if ((bool)userShare.EditAccess)
+                {
+                    return BadRequest("You have not permission");
+                }
             }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -125,8 +132,7 @@ namespace DSP_API.Controllers
 
             updateBox.Content = boxUpdate.Content;
             updateBox.Title = boxUpdate.Title;
-            updateBox.IsAvailable = boxUpdate.IsAvailable;
-            updateBox.Pass = boxUpdate.Pass;
+            updateBox.SharedStatus = boxUpdate.SharedStatus;
 
 
             _context.Update(updateBox);
@@ -156,7 +162,7 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. Box is null");
             }
-            if (box.IsAvailable == false || box.AdminBan == true)
+            if (box.SharedStatus == false || box.AdminBan == true)
             {
                 return BadRequest("0. Box is not available");
             }
@@ -250,11 +256,7 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. The box is not exists");
             }
-            var listUserShare = box.Users.Select(u => new { u.Id, u.Username, u.Img, u.Name }).ToList();
-            if (box.UserId != _UserId && !listUserShare.Any(l => l.Id == _UserId) && !_UserRole.Contains("Edit"))
-            {
-                return BadRequest("0. You have not permission");
-            }
+
             //add file on db
             var fileName = System.IO.Path.GetFileName(file.FileName);
             var newFile = new Models.Entity.File()
@@ -296,11 +298,7 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. The box is not exists");
             }
-            var listUserShare = box.Users.Select(u => new { u.Id, u.Username, u.Img, u.Name }).ToList();
-            if (box.UserId != _UserId && !listUserShare.Any(l => l.Id == _UserId) && !_UserRole.Contains("Edit"))
-            {
-                return BadRequest("0. You have not permission");
-            }
+
             var file = await _context.Files.FirstOrDefaultAsync(f => f.Id == Id);
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", userName, box.Url, fileName);
             System.IO.File.Delete(path);
@@ -319,11 +317,7 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. The box is not exitsts");
             }
-            var listUserShare = box.Users.Select(u => new { u.Id, u.Username, u.Img, u.Name }).ToList();
-            if (box.UserId != _UserId && !listUserShare.Any(l => l.Id == _UserId) && !_UserRole.Contains("Edit"))
-            {
-                return BadRequest("0. You have not permission");
-            }
+
             string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", box.User.Username, box.Url);
             if (Directory.Exists(path))
             {
@@ -337,95 +331,8 @@ namespace DSP_API.Controllers
             return Ok("1. Delete successfully");
 
         }
-        [HttpGet]
-        [SwaggerOperation(Summary = "Get list user have been share to the box ")]
-        public async Task<IActionResult> GetUserShareInBox(int boxId)
-        {
-
-            var box = await _context.Boxs.Where(b => b.Id == boxId).Include(b => b.Users).FirstOrDefaultAsync();
-            if (box == null)
-            {
-                return BadRequest("0. box is null");
-            }
-            if (box.UserId != _UserId)
-            {
-                return BadRequest("0. You have not permission");
-            }
-            var listUserShare = box.Users.Select(u => new { u.Id, u.Username, u.Img, u.Name }).ToList();
-            return Ok(listUserShare);
-        }
-
-        [HttpGet]
-        [IsLogin()]
-        [SwaggerOperation(Summary = "Get list box have been share to the User")]
-        public async Task<IActionResult> GetBoxShareCurrentUser()
-        {
-
-            var user = await _context.Users.Where(u => u.Id == _UserId).Include(u => u.BoxesNavigation).FirstOrDefaultAsync();
-            var listBoxShare = user.BoxesNavigation.Select(bn => new { bn.Id, bn.Title, bn.Content, bn.Img, bn.IsAvailable, bn.AdminBan, bn.DateCreated, bn.View, bn.Url });
-            return Ok(listBoxShare);
-        }
-        [HttpPost]
-        [IsLogin()]
-        public async Task<IActionResult> AddBoxShare(int boxId, int userId)
-        {
-            var box = await _context.Boxs.Where(b => b.Id == boxId).Include(b => b.Users).FirstOrDefaultAsync();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (box == null || user == null)
-            {
-                return BadRequest("0. Box or User is null|");
-            }
-            var listUserShare = box.Users.Select(u => new { u.Id, u.Username, u.Img, u.Name }).ToList();
-            if (box.UserId != _UserId && !listUserShare.Any(l => l.Id == _UserId))
-            {
-                return BadRequest("0. You have not permission");
-            }
-            if (listUserShare.Any(l => l.Id == userId))
-            {
-                return BadRequest("0. User is already exists ");
-            };
-            box.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return Ok("1. Successfully");
-        }
-        [HttpDelete]
-        [IsLogin()]
-        public async Task<IActionResult> RemoveBoxShare(int boxId, int userId)
-        {
-            var box = await _context.Boxs.Where(b => b.Id == boxId).Include(b => b.Users).FirstOrDefaultAsync();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (box == null || user == null)
-            {
-                return BadRequest("0. Box or User is null|");
-            }
-            var listUserShare = box.Users.Select(u => new { u.Id, u.Username, u.Img, u.Name }).ToList();
-            if (box.UserId != _UserId && !listUserShare.Any(l => l.Id == _UserId))
-            {
-                return BadRequest("0. You have not permission");
-            }
-            if (!listUserShare.Any(l => l.Id == userId))
-            {
-                return BadRequest("0. User is not already exists ");
-            };
-            box.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return Ok("1. Successfully");
-        }
 
 
-        private async Task<bool> IsInBoxShare(int boxId)
-        {
-            var listIdUser = await _context.Boxs.Where(b => b.Id == boxId).Include(b => b.Users).Select(b => b.User.Id).ToListAsync();
-            if (listIdUser.Contains(_UserId))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
 
         private void Empty(System.IO.DirectoryInfo directory)
         {
@@ -433,7 +340,7 @@ namespace DSP_API.Controllers
             foreach (System.IO.DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
         }
 
-       
+
         private bool IsAuth(int possession)
         {
             if (possession == _UserId)
@@ -451,9 +358,7 @@ namespace DSP_API.Controllers
 
         public string? Content { get; set; }
 
-        public string? Pass { get; set; }
-
-        public bool? IsAvailable { get; set; }
+        public bool? SharedStatus { get; set; }
 
     }
 

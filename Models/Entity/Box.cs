@@ -11,13 +11,9 @@ public partial class Box
 
     public string? Content { get; set; }
 
-    public string? Pass { get; set; }
-
     public string? ShareCode { get; set; }
 
     public string? Url { get; set; }
-
-    public bool? IsAvailable { get; set; }
 
     public int? UserId { get; set; }
 
@@ -29,6 +25,14 @@ public partial class Box
 
     public bool? AdminBan { get; set; }
 
+    public bool? SharedStatus { get; set; }
+
+    public string? ShareView { get; set; }
+
+    public string? ShareEdit { get; set; }
+
+    public virtual ICollection<BoxShare> BoxShares { get; set; } = new List<BoxShare>();
+
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
     public virtual ICollection<File> Files { get; set; } = new List<File>();
@@ -36,6 +40,4 @@ public partial class Box
     public virtual User? User { get; set; }
 
     public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
-
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

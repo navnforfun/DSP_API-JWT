@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace App
@@ -79,6 +80,14 @@ namespace App
                 return false;
             }
 
+        }
+        public static string Unaccents(this string s){
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            byte[] tempBytes;
+            tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(s);
+            string asciiStr = System.Text.Encoding.UTF8.GetString(tempBytes);
+            return asciiStr;
         }
 
 

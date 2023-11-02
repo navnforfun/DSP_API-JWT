@@ -23,13 +23,13 @@ public partial class User
 
     public string? Email { get; set; }
 
+    public virtual ICollection<BoxShare> BoxShares { get; set; } = new List<BoxShare>();
+
     public virtual ICollection<Box> Boxes { get; set; } = new List<Box>();
 
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
     public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
-
-    public virtual ICollection<Box> BoxesNavigation { get; set; } = new List<Box>();
 
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 }

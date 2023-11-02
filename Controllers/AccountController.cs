@@ -63,6 +63,7 @@ namespace DSP_API.Controllers
         public async Task<IActionResult> LoginByToken()
         {
             var token = (HttpContext.Request.Headers[HeaderNames.Authorization]).ToString();
+            _let.print(token);
             if (!string.IsNullOrWhiteSpace(token))
             {
                 // System.Console.WriteLine(token);
@@ -163,7 +164,7 @@ namespace DSP_API.Controllers
                 new Claim(ClaimTypes.GivenName, user.Name),
                 new Claim(ClaimTypes.Role, string.Concat(user.Roles.Select(x => x.Name).ToList()))
             };
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims, expires: DateTime.Now.AddMinutes(1), signingCredentials: credentials);
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims, expires: DateTime.Now.AddDays(30), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 

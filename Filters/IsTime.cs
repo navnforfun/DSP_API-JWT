@@ -19,7 +19,24 @@ namespace DSP_API.Configurations.Filters
         {
 
 
-            var token = (context.HttpContext.Request.Headers[HeaderNames.Authorization]).ToString().Substring(7);
+            var token = (context.HttpContext.Request.Headers[HeaderNames.Authorization]).ToString();
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                context.Result = new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Content = "Your token is not exits"
+                };
+                return;
+            }
+            if(token.Length < 10){
+                 context.Result = new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Content = "Your token is not exits"
+                };
+                return;
+            }
             try
             {
                 if (!_let.CheckTokenIsValid(token))

@@ -17,6 +17,8 @@ public partial class DspApiContext : DbContext
 
     public virtual DbSet<Box> Boxs { get; set; }
 
+    public virtual DbSet<BoxShare> BoxShares { get; set; }
+
     public virtual DbSet<Comment> Comments { get; set; }
 
     public virtual DbSet<File> Files { get; set; }
@@ -39,33 +41,39 @@ public partial class DspApiContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Img).HasMaxLength(255);
-            entity.Property(e => e.IsAvailable)
+            entity.Property(e => e.ShareCode).HasMaxLength(255);
+            entity.Property(e => e.ShareEdit)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.ShareView)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.SharedStatus)
                 .IsRequired()
                 .HasDefaultValueSql("(CONVERT([bit],(0)))");
-            entity.Property(e => e.Pass).HasMaxLength(255);
-            entity.Property(e => e.ShareCode).HasMaxLength(255);
             entity.Property(e => e.Title).HasMaxLength(255);
             entity.Property(e => e.Url).HasMaxLength(255);
 
             entity.HasOne(d => d.User).WithMany(p => p.Boxes)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK_Boxs_Accounts_UserId");
+        });
 
-            entity.HasMany(d => d.Users).WithMany(p => p.BoxesNavigation)
-                .UsingEntity<Dictionary<string, object>>(
-                    "BoxShare",
-                    r => r.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("sharebox"),
-                    l => l.HasOne<Box>().WithMany()
-                        .HasForeignKey("BoxId")
-                        .HasConstraintName("boxshare"),
-                    j =>
-                    {
-                        j.HasKey("BoxId", "UserId").HasName("PK__BoxShare__60252D3E54EEA8C4");
-                        j.ToTable("BoxShares");
-                        j.HasIndex(new[] { "BoxId" }, "IX_BoxShares_BoxId");
-                    });
+        modelBuilder.Entity<BoxShare>(entity =>
+        {
+            entity.HasKey(e => new { e.BoxId, e.UserId }).HasName("PK__BoxShare__60252D3E54EEA8C4");
+
+            entity.HasIndex(e => e.BoxId, "IX_BoxShares_BoxId");
+
+            entity.Property(e => e.EditAccess).HasColumnName("EditAccess ");
+
+            entity.HasOne(d => d.Box).WithMany(p => p.BoxShares)
+                .HasForeignKey(d => d.BoxId)
+                .HasConstraintName("boxshare");
+
+            entity.HasOne(d => d.User).WithMany(p => p.BoxShares)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("sharebox");
         });
 
         modelBuilder.Entity<Comment>(entity =>

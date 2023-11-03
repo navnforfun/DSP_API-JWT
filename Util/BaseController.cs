@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using App;
 
 namespace DSP_API.Util
 {
@@ -13,6 +14,7 @@ namespace DSP_API.Util
         {
             get
             {
+
                 return HttpContext.Session.GetString("Username");
 
             }
@@ -49,7 +51,13 @@ namespace DSP_API.Util
         {
             get
             {
-                return (int)HttpContext.Session.GetInt32("UserId");
+
+                if (HttpContext.Session.GetInt32("UserId") == null)
+                {
+                    HttpContext.Session.SetInt32("UserId", 0);
+                }
+         
+                return   (int)HttpContext.Session.GetInt32("UserId") ;
 
             }
             set
@@ -57,8 +65,38 @@ namespace DSP_API.Util
                 HttpContext.Session.SetInt32("UserId", value);
             }
         }
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            // var Username = _Username;
+            // if (string.IsNullOrEmpty(Username))
+            // {
+            //     _Username = "";
+
+            // }
+            // int id = _UserId;
+            // if (string.IsNullOrEmpty(id.ToString()))
+            // {
+            //     _UserId = 0;
+
+            // }
+            // if(_let.first){
+            //     _UserId = 0;
+            //     _Name = "";
+            //     _Username = "";
+            //     _UserRole = "";
+            //     _let.first = false;
+            // }
+
+            base.OnActionExecuting(context);
+        }
         public override void OnActionExecuted(ActionExecutedContext context)
         {
+
+
+            // If the UserId session variable is null, set it to the default user ID.
+
+
+
             base.OnActionExecuted(context);
 
             // Log information about the action execution

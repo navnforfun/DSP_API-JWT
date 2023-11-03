@@ -77,9 +77,6 @@ namespace DSP_API.Controllers
         public async Task<IActionResult> GetDetailBox(int boxId, string? pass)
         {
             var box = await _context.Boxs.FirstOrDefaultAsync(b => b.Id == boxId);
-            box.View++;
-            _context.Update(box);
-            await _context.SaveChangesAsync();
             if (box == null)
             {
                 return BadRequest("Box is not exists");
@@ -88,6 +85,8 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. The box id baned by admin");
             }
+
+
             if (box.SharedStatus == false)
             {
                 var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId).ToArray();
@@ -97,7 +96,10 @@ namespace DSP_API.Controllers
 
                 }
             }
-
+            box.View++;
+    
+            _context.Update(box);
+            await _context.SaveChangesAsync();
             return Ok(box);
         }
         [HttpPut]

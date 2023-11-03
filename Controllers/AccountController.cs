@@ -28,9 +28,10 @@ namespace DSP_API.Controllers
             _config = config;
         }
         [HttpGet]
-        [Authorize(Roles = "AdminEdit,Admin")]
         public IActionResult Test(){
-            return Ok("Ok thanh con");
+            System.Console.WriteLine(_Username);
+            System.Console.WriteLine(_UserId);
+            return Ok("Ok thanh cong");
         }
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] AccountLogin accountLogin)

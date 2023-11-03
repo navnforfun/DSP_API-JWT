@@ -6,6 +6,7 @@ namespace App
 {
     public static class _let
     {
+        public static bool first = true;
         public static void print(string? s)
         {
             // Console.BackgroundColor = ConsoleColor.Blue;

@@ -62,7 +62,6 @@ namespace DSP_API.Controllers
 
             user.Img = $"Uploads/{_Username}/{Img.FileName}";
             await _context.SaveChangesAsync();
-
             return Ok("1. Successfully");
         }
         [IsLogin()]

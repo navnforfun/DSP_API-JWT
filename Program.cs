@@ -59,6 +59,11 @@ builder.Services.AddSession(o =>
 
 builder.Services.AddHttpContextAccessor();
 
+
+
+// mapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 app.UseCors(builder => builder
        .AllowAnyHeader()

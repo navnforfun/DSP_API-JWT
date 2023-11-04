@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using App;
+using AutoMapper;
 using DSP_API.Configurations.Filters;
 using DSP_API.Models.Entity;
 using DSP_API.Util;
@@ -19,9 +20,11 @@ namespace DSP_API.Controllers
     {
         private readonly DspApiContext _context;
 
-        public BoxController(DspApiContext context)
+        private readonly IMapper _mapper;
+        public BoxController(DspApiContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [HttpPost]
         [IsLogin()]
@@ -97,10 +100,12 @@ namespace DSP_API.Controllers
                 }
             }
             box.View++;
-    
+
             _context.Update(box);
             await _context.SaveChangesAsync();
-            return Ok(box);
+            var boxDto = _mapper.Map<BoxDto>(box);
+            // System.Console.WriteLine(boxDto.Title);
+            return Ok(boxDto);
         }
         [HttpPut]
         [IsLogin()]
@@ -139,7 +144,8 @@ namespace DSP_API.Controllers
 
             _context.Update(updateBox);
             await _context.SaveChangesAsync();
-            return Ok("1. Update thanh cong");
+
+            return Ok("Success");
         }
 
         [HttpGet]

@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using App;
+using AutoMapper;
 
 namespace DSP_API.Util
 {
@@ -56,8 +57,8 @@ namespace DSP_API.Util
                 {
                     HttpContext.Session.SetInt32("UserId", 0);
                 }
-         
-                return   (int)HttpContext.Session.GetInt32("UserId") ;
+
+                return (int)HttpContext.Session.GetInt32("UserId");
 
             }
             set
@@ -65,6 +66,7 @@ namespace DSP_API.Util
                 HttpContext.Session.SetInt32("UserId", value);
             }
         }
+      
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             // var Username = _Username;

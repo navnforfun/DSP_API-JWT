@@ -24,18 +24,6 @@ namespace DSP_API.Util
                 HttpContext.Session.SetString("Username", value);
             }
         }
-        public string _Name
-        {
-            get
-            {
-                return HttpContext.Session.GetString("Name");
-
-            }
-            set
-            {
-                HttpContext.Session.SetString("Name", value);
-            }
-        }
         public string _UserRole
         {
             get
@@ -66,28 +54,19 @@ namespace DSP_API.Util
                 HttpContext.Session.SetInt32("UserId", value);
             }
         }
-      
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            // var Username = _Username;
-            // if (string.IsNullOrEmpty(Username))
-            // {
-            //     _Username = "";
+            _UserId = HttpContext.User.GetLoggedInUserId<int>();
+            if (HttpContext.User.GetLoggedInUserName() == null)
+            {
+                _Username = "";
 
-            // }
-            // int id = _UserId;
-            // if (string.IsNullOrEmpty(id.ToString()))
-            // {
-            //     _UserId = 0;
-
-            // }
-            // if(_let.first){
-            //     _UserId = 0;
-            //     _Name = "";
-            //     _Username = "";
-            //     _UserRole = "";
-            //     _let.first = false;
-            // }
+            }
+            else
+            {
+                _Username = HttpContext.User.GetLoggedInUserName();
+            };
 
             base.OnActionExecuting(context);
         }

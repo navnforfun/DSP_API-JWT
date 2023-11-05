@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -82,7 +83,8 @@ namespace App
             }
 
         }
-        public static string Unaccents(this string s){
+        public static string Unaccents(this string s)
+        {
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             byte[] tempBytes;
@@ -173,5 +175,58 @@ namespace App
         }
 
     }
+    public static class ClaimsPrincipalExtensions
+    {
+        public static T GetLoggedInUserId<T>(this ClaimsPrincipal principal)
+        {
+            if (principal == null)
+                throw new ArgumentNullException(nameof(principal));
+
+            var loggedInUserId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (typeof(T) == typeof(string))
+            {
+                return (T)Convert.ChangeType(loggedInUserId, typeof(T));
+            }
+            else if (typeof(T) == typeof(int) || typeof(T) == typeof(long))
+            {
+                return loggedInUserId != null ? (T)Convert.ChangeType(loggedInUserId, typeof(T)) : (T)Convert.ChangeType(0, typeof(T));
+            }
+            else
+            {
+                throw new Exception("Invalid type provided");
+            }
+        }
+
+        public static string GetLoggedInUserName(this ClaimsPrincipal principal)
+        {
+            if (principal == null)
+                throw new ArgumentNullException(nameof(principal));
+
+            return principal.FindFirstValue(ClaimTypes.Name);
+        }
+
+        public static string GetLoggedInUserEmail(this ClaimsPrincipal principal)
+        {
+            if (principal == null)
+                throw new ArgumentNullException(nameof(principal));
+
+            return principal.FindFirstValue(ClaimTypes.Email);
+        }
+    }
 
 }
+// public class UserRepository 
+// {
+//     private readonly IHttpContextAccessor _httpContextAccessor;
+
+//     public UserRepository(IHttpContextAccessor httpContextAccessor) =>
+//         _httpContextAccessor = httpContextAccessor;
+
+//     public void LogCurrentUser()
+//     {
+//         var username = _httpContextAccessor.HttpContext.User.Identity.Name;
+//         _
+//         // ...
+//     }
+// }

@@ -20,12 +20,13 @@ namespace DSP_API.Configurations.Filters
 
 
             var token = (context.HttpContext.Request.Headers[HeaderNames.Authorization]).ToString();
-            if (!string.IsNullOrWhiteSpace(token))
+            System.Console.WriteLine(token);
+            if (string.IsNullOrWhiteSpace(token))
             {
                 context.Result = new ContentResult()
                 {
                     StatusCode = StatusCodes.Status401Unauthorized,
-                    Content = "Your token is not exits"
+                    Content = "Your token is not exits 1"
                 };
                 return;
             }
@@ -39,7 +40,7 @@ namespace DSP_API.Configurations.Filters
             }
             try
             {
-                if (!_let.CheckTokenIsValid(token))
+                if (!_let.CheckTokenIsValid(token.Substring(7)))
                 {
                     context.Result = new ContentResult()
                     {

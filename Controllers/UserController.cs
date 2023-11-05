@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using DSP_API.Configurations.Filters;
 using DSP_API.Models.Entity;
 using DSP_API.Util;
@@ -15,24 +16,27 @@ namespace DSP_API.Controllers
     public class UserController : BaseController
     {
         private readonly DspApiContext _context;
+        private readonly IMapper _mapper;
 
-        public UserController(DspApiContext context)
+        public UserController(DspApiContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [IsLogin()]
         [HttpGet]
         public async Task<IActionResult> GetCurrentUser()
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == _UserId);
-            var returnUser = new
-            {
-                UserName = user.Username,
-                Img = user.Img,
-                Name = user.Name,
-                Description = user.Description,
-                Job = user.JobTitle
-            };
+            // var returnUser = new
+            // {
+            //     UserName = user.Username,
+            //     Img = user.Img,
+            //     Name = user.Name,
+            //     Description = user.Description,
+            //     Job = user.JobTitle
+            // };
+            var returnUser = _mapper.Map<UserDto>(user);
             return Ok(returnUser);
         }
         [IsLogin()]

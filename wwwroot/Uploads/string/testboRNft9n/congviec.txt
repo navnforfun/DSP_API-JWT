@@ -1,0 +1,9 @@
+1. Kiểm tra lại kết hợp của esp32 và python nhận lửa nghiên cứu fast python
+
+2. Vẽ biểu đồ môn kỹ nghệ phần mềm
+
+3. Ôn ngữ pháp môn tiếng anh
+
+4. viết api DSP( Tag)
+
+6. Làm vue 

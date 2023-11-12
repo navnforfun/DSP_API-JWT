@@ -40,7 +40,6 @@ public partial class DspApiContext : DbContext
             entity.HasIndex(e => e.UserId, "IX_Boxs_UserId");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Img).HasMaxLength(255);
             entity.Property(e => e.ShareCode).HasMaxLength(255);
             entity.Property(e => e.ShareEdit)
                 .HasMaxLength(255)
@@ -51,7 +50,6 @@ public partial class DspApiContext : DbContext
             entity.Property(e => e.SharedStatus)
                 .IsRequired()
                 .HasDefaultValueSql("(CONVERT([bit],(0)))");
-            entity.Property(e => e.Title).HasMaxLength(255);
             entity.Property(e => e.Url).HasMaxLength(255);
 
             entity.HasOne(d => d.User).WithMany(p => p.Boxes)

@@ -147,13 +147,14 @@ namespace DSP_API.Controllers
         {
             var box = await _context.Boxs.FirstOrDefaultAsync(b => b.Id == boxId);
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
-            if (box.UserId == _UserId)
-            {
-                return Ok("You are the owner");
-            }
+            
             if (box == null || user == null)
             {
                 return BadRequest("0. Box or User is null|");
+            }
+            if (box.UserId == user.Id)
+            {
+                return Ok("You are the owner");
             }
             var listBoxShare = _context.BoxShares.Where(bs => bs.BoxId == boxId);
             if (!IsAuth(box.UserId))
@@ -331,6 +332,25 @@ namespace DSP_API.Controllers
         {
             if (possession == _UserId)
             {
+                return true;
+            }
+            return false;
+        }
+        private  bool IsInShareEdit(Box box)
+        {
+            var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId);
+            if (listUserShare.Contains(_UserId))
+            {
+                var userShare = _context.BoxShares.FirstOrDefault(b => b.BoxId == box.Id && b.UserId == _UserId);
+                if(userShare.EditAccess == true){
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool IsInShare(Box box){
+            var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId);
+            if(listUserShare.Contains(_UserId)){
                 return true;
             }
             return false;

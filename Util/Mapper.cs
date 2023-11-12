@@ -59,11 +59,11 @@ namespace DSP_API.Util
 
         public bool? SharedStatus { get; set; }
 
-        public virtual ICollection<BoxShare> BoxShares { get; set; } = new List<BoxShare>();
+        // public virtual ICollection<BoxShare> BoxShares { get; set; } = new List<BoxShare>();
 
-        public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        // public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-        public virtual ICollection<Models.Entity.File> Files { get; set; } = new List<Models.Entity.File>();
-        public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
+        // public virtual ICollection<Models.Entity.File> Files { get; set; } = new List<Models.Entity.File>();
+        // public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
     }
 }

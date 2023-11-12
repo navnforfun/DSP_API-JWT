@@ -66,7 +66,8 @@ namespace DSP_API.Controllers
                 var x = await UploadBoxFile(f, newBox.Id);
             }
 
-            return Ok("1. Create successfully");
+            var boxDto = _mapper.Map<BoxDto>(newBox);
+            return Ok(boxDto);
         }
         [HttpGet]
         [IsLogin()]
@@ -165,14 +166,22 @@ namespace DSP_API.Controllers
         public async Task<IActionResult> GetListFileInBox(int boxId)
         {
             var box = await _context.Boxs.FirstOrDefaultAsync(b => b.Id == boxId);
-
             if (box == null)
             {
                 return BadRequest("0. Box is null");
             }
-            if (box.SharedStatus == false || box.AdminBan == true)
+
+            if (box.AdminBan == true)
             {
-                return BadRequest("0. Box is not available");
+                return BadRequest("0. Box is ban by admin");
+            }
+            if (box.SharedStatus == false)
+            {
+                if (!IsAuth(box.Id) && !IsInShare(box))
+                {
+                    return BadRequest("0. Box is not available");
+
+                }
             }
             var listFile = _context.Files.Where(f => f.BoxId == boxId).Select(lf => new { lf.Id, lf.Name, lf.Size, lf.View });
             return Ok(listFile);
@@ -264,7 +273,9 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. The box is not exists");
             }
-
+            if(!IsAuth(box.Id) && !IsInShareEdit(box)){
+                return BadRequest("You have not permission");
+            }
             //add file on db
             var fileName = System.IO.Path.GetFileName(file.FileName);
             var newFile = new Models.Entity.File()
@@ -279,7 +290,7 @@ namespace DSP_API.Controllers
 
 
             // add file in system
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", _Username, box.Url);
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", box.User.Username, box.Url);
             var filePath = Path.Combine(path, fileName);
             //Create directory
             Directory.CreateDirectory(path);
@@ -349,9 +360,30 @@ namespace DSP_API.Controllers
         }
 
 
-        private bool IsAuth(int possession)
+        private bool IsAuth(int? possession)
         {
             if (possession == _UserId)
+            {
+                return true;
+            }
+            return false;
+        }
+        private  bool IsInShareEdit(Box box)
+        {
+            var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId);
+            if (listUserShare.Contains(_UserId))
+            {
+                var userShare = _context.BoxShares.FirstOrDefault(b => b.BoxId == box.Id && b.UserId == _UserId);
+                if(userShare.EditAccess == true){
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool IsInShare(Box box)
+        {
+            var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId);
+            if (listUserShare.Contains(_UserId))
             {
                 return true;
             }
@@ -361,9 +393,9 @@ namespace DSP_API.Controllers
     public class BoxCreate
     {
         [Required(ErrorMessage = "Empty {0}")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
+        [StringLength(200, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
         public string Title { get; set; }
-
+        [Required(ErrorMessage = "Empty {0}")]
         public string? Content { get; set; }
 
         public bool? SharedStatus { get; set; }

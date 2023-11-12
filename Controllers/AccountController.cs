@@ -133,7 +133,7 @@ namespace DSP_API.Controllers
             {
                 Username = accountRegister.UserName,
                 Name = accountRegister.UserName,
-                Img = "/Uploads/Defaults/avtuser.jpg",
+                Img = "Uploads/Defaults/avtuser.jpg",
                 Password = accountRegister.PassWord,
                 BanEnabled = false
             };

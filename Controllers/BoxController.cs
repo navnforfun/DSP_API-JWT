@@ -177,7 +177,7 @@ namespace DSP_API.Controllers
             }
             if (box.SharedStatus == false)
             {
-                if (!IsAuth(box.Id) && !IsInShare(box))
+                if (!IsAuth(box.UserId) && !IsInShare(box))
                 {
                     return BadRequest("0. Box is not available");
 
@@ -274,7 +274,7 @@ namespace DSP_API.Controllers
                 return BadRequest("0. The box is not exists");
             }
             if(!IsAuth(box.Id) && !IsInShareEdit(box)){
-                return BadRequest("You have not permission");
+                return BadRequest("You have not permission!");
             }
             //add file on db
             var fileName = System.IO.Path.GetFileName(file.FileName);

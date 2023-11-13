@@ -110,7 +110,7 @@ namespace DSP_API.Controllers
         }
         [HttpPut]
         [IsLogin()]
-        public async Task<IActionResult> UpdateBox(int Id, [FromForm] BoxCreate boxUpdate)
+        public async Task<IActionResult> UpdateBox(int Id, [FromForm] BoxCreate boxUpdate, IFormFile? Img)
         {
 
             var updateBox = await _context.Boxs.Where(b => b.Id == Id).Include(b => b.User).FirstOrDefaultAsync();
@@ -123,12 +123,7 @@ namespace DSP_API.Controllers
 
             if (updateBox.UserId != _UserId)
             {
-                var userShare = await _context.BoxShares.FirstOrDefaultAsync(b => b.BoxId == updateBox.Id && b.UserId == _UserId);
-                if (userShare == null)
-                {
-                    return BadRequest("You have not permission");
-                }
-                if ((bool)userShare.EditAccess)
+                if (IsInShareEdit(updateBox))
                 {
                     return BadRequest("You have not permission");
                 }
@@ -136,6 +131,21 @@ namespace DSP_API.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (Img != null)
+            {
+                var oldAvtName = updateBox.Img.Substring(updateBox.Img.LastIndexOf("/") +1);
+                var deleteAvt = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads",  updateBox.User.Username,updateBox.Url, "avt",oldAvtName);
+                try{
+                    System.IO.File.Delete(deleteAvt);
+                }catch{
+                    _let.print("This box use default img");
+                }
+                string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", updateBox.User.Username, updateBox.Url, "avt");
+                await UploadFile(Img, path);
+                updateBox.Img = $"Uploads/{_Username}/{updateBox.Url}/avt/{Img.FileName}";
+                
             }
 
             updateBox.Content = boxUpdate.Content;
@@ -273,7 +283,8 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. The box is not exists");
             }
-            if(!IsAuth(box.Id) && !IsInShareEdit(box)){
+            if (!IsAuth(box.Id) && !IsInShareEdit(box))
+            {
                 return BadRequest("You have not permission!");
             }
             //add file on db
@@ -368,13 +379,18 @@ namespace DSP_API.Controllers
             }
             return false;
         }
-        private  bool IsInShareEdit(Box box)
+        private bool IsInShareEdit(Box box)
         {
             var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId);
             if (listUserShare.Contains(_UserId))
             {
                 var userShare = _context.BoxShares.FirstOrDefault(b => b.BoxId == box.Id && b.UserId == _UserId);
-                if(userShare.EditAccess == true){
+                if (userShare == null)
+                {
+                    return false;
+                }
+                if (userShare.EditAccess == true)
+                {
                     return true;
                 }
             }

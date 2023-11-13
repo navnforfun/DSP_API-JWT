@@ -342,6 +342,9 @@ namespace DSP_API.Controllers
             if (listUserShare.Contains(_UserId))
             {
                 var userShare = _context.BoxShares.FirstOrDefault(b => b.BoxId == box.Id && b.UserId == _UserId);
+                if(userShare == null){
+                    return false;
+                }
                 if(userShare.EditAccess == true){
                     return true;
                 }

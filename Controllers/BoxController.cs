@@ -63,7 +63,7 @@ namespace DSP_API.Controllers
             foreach (var f in Files)
             {
 
-                var x = await UploadBoxFile(f, newBox.Id);
+                await UploadBoxFile(f, newBox.Id);
             }
 
             var boxDto = _mapper.Map<BoxDto>(newBox);
@@ -283,7 +283,7 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("0. The box is not exists");
             }
-            if (!IsAuth(box.Id) && !IsInShareEdit(box))
+            if (!IsAuth(box.UserId) && !IsInShareEdit(box))
             {
                 return BadRequest("You have not permission!");
             }

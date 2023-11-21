@@ -35,7 +35,7 @@ namespace DSP_API.Util
 
         public string? Email { get; set; }
 
-        public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+        // public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
     }
     public class BoxDto
     {

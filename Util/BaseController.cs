@@ -67,6 +67,14 @@ namespace DSP_API.Util
             {
                 _Username = HttpContext.User.GetLoggedInUserName();
             };
+            if (HttpContext.User.GetLoggedInUserRole() == null)
+            {
+                _UserRole = "";
+            }
+            else
+            {
+                _UserRole = HttpContext.User.GetLoggedInUserRole();
+            }
 
             base.OnActionExecuting(context);
         }

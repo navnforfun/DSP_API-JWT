@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using DSP_API.Configurations.Filters;
 using DSP_API.Models.Entity;
 using DSP_API.Util;
@@ -16,16 +17,19 @@ namespace DSP_API.Controllers
     public class AdminController : BaseController
     {
         private readonly DspApiContext _context;
+          private readonly IMapper _mapper;
 
-        public AdminController(DspApiContext context)
+        public AdminController(DspApiContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [HttpGet]
         public async Task<IActionResult> GetListUser()
         {
-            var listUser = await _context.Users.Select(u => new { u.Id, u.Username, u.Name, u.Img, u.Description }).ToListAsync();
-            return Ok(listUser);
+            var listUser = await _context.Users.ToListAsync();
+            var listUserDto = _mapper.Map<List<User>,List<UserDto>>(listUser);
+            return Ok(listUserDto);
         }
         [HttpPut]
         public async Task<IActionResult> BanUser(int userId)
@@ -56,9 +60,10 @@ namespace DSP_API.Controllers
         {
 
             var boxs = await _context.Boxs.ToListAsync();
-            return Ok(boxs);
+            var boxsDio = _mapper.Map<List<Box>,List<BoxDto>>(boxs);
+            return Ok(boxsDio);
         }
-               [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> GetBoxsByIdUser(int Id)
         {
             if (!_UserRole.Contains("Edit"))

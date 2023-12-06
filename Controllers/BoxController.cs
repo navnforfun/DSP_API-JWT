@@ -345,7 +345,7 @@ namespace DSP_API.Controllers
             var box = await _context.Boxs.Where(b => b.Id == boxId).Include(b => b.User).FirstOrDefaultAsync();
             if (box == null)
             {
-                return BadRequest("The box is not exitsts");
+                return BadRequest("The box is not exists");
             }
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", box.User.Username, box.Url);

@@ -92,6 +92,7 @@ app.UseCors(builder => builder
        .AllowAnyHeader()
        .AllowAnyMethod()
        .AllowAnyOrigin()
+       .WithExposedHeaders("x-file-name", "Content-Disposition")
     //.AllowCredentials()
     );
 // Configure the HTTP request pipeline.

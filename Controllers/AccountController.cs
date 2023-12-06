@@ -80,7 +80,8 @@ namespace DSP_API.Controllers
         {
 
             var Username = HttpContext.User.GetLoggedInUserName();
-            if(Username == null){
+            if (Username == null)
+            {
                 return BadRequest("You token is not valid");
             }
             var tokenUser = await _context.Users.Where(u => u.Username == Username).Include(u => u.Roles).FirstOrDefaultAsync();
@@ -143,6 +144,32 @@ namespace DSP_API.Controllers
             _context.SaveChanges();
             return Ok(newUser);
         }
+        [IsAdmin]
+        [HttpPost]
+        public IActionResult RegisterAdmin([FromForm] AccountByAdmin account)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (_context.Users.Any(u => u.Username == account.UserName))
+            {
+                return BadRequest("The username is already exists");
+
+            }
+            var newUser = new User()
+            {
+                Username = account.UserName,
+                Name = account.Name,
+                Img = "Uploads/Defaults/avtuser.jpg",
+                Password = account.PassWord,
+                BanEnabled = false,
+                Email = account.Email
+            };
+            _context.Add(newUser);
+            _context.SaveChanges();
+            return Ok(newUser);
+        }
         [HttpGet]
         public IActionResult Logout()
         {
@@ -162,7 +189,7 @@ namespace DSP_API.Controllers
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, string.Concat(user.Roles.Select(x => x.Name).ToList())),
                 new Claim("id",user.Id.ToString()),
-                new Claim("userName",user.Username),  
+                new Claim("userName",user.Username),
                 new Claim("name",user.Name),
                 new Claim("img",user.Img),
                 new Claim ("email",user.Email== null?"":user.Email),
@@ -192,6 +219,21 @@ namespace DSP_API.Controllers
         [Required(ErrorMessage = "Empty {0}")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
         public string RePass { get; set; }
+    }
+    public class AccountByAdmin
+    {
+        [Required(ErrorMessage = "Empty {0}")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
+        public string UserName { get; set; }
+        [Required(ErrorMessage = "Empty {0}")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
+        public string Name { get; set; }
+        [Required(ErrorMessage = "Empty {0}")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
+        public string PassWord { get; set; }
+           [Required(ErrorMessage = "Empty {0}")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
+        public string Email { get; set; }
     }
 
 }

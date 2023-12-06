@@ -53,23 +53,24 @@ namespace DSP_API.Controllers
             var userLogin = await _context.Users.Where(u => u.Username == accountLogin.UserName).Include(u => u.Roles).FirstOrDefaultAsync();
             if (userLogin == null)
             {
-                return BadRequest("0. Khong co user");
+                return BadRequest("Khong co user");
+                // return StatusCode(412,"Not valid");
             }
             if (userLogin.Password != accountLogin.PassWord)
             {
 
-                return BadRequest("0. sai pass");
+                return BadRequest("sai pass");
             }
             if (userLogin.BanEnabled == true)
             {
-                return BadRequest("0. The account was baned by admin!");
+                return BadRequest("The account was baned by admin!");
             }
             var token = Generate(userLogin);
             _UserId = userLogin.Id;
             _Username = userLogin.Username;
             _UserRole = string.Concat(userLogin.Roles.Select(x => x.Name).ToList());
             _let.print("Login ok - " + _UserId + " - " + _Username + " - " + _UserRole);
-            // return Ok("1. Login ok - " + _UserId + " - " + _Username + " - " + _UserRole + "\nToken:" +token);
+            // return Ok("Login ok - " + _UserId + " - " + _Username + " - " + _UserRole + "\nToken:" +token);
             return Ok(token);
         }
         [HttpPost]
@@ -92,19 +93,19 @@ namespace DSP_API.Controllers
                 System.Console.WriteLine("Login by token ok");
                 if (tokenUser == null)
                 {
-                    return BadRequest("0. Khong co user");
+                    return BadRequest("Khong co user");
                 }
 
                 if (tokenUser.BanEnabled == true)
                 {
-                    return BadRequest("0. The account was baned by admin!");
+                    return BadRequest("The account was baned by admin!");
                 }
 
                 _UserId = tokenUser.Id;
                 _Username = tokenUser.Username;
                 _UserRole = string.Concat(tokenUser.Roles.Select(x => x.Name).ToList());
                 _let.print("Login ok - " + _UserId + " - " + _Username + " - " + _UserRole);
-                // return Ok("1. Login ok - " + _UserId + " - " + _Username + " - " + _UserRole + "\nToken:" +token);
+                // return Ok("Login ok - " + _UserId + " - " + _Username + " - " + _UserRole + "\nToken:" +token);
                 return Ok(Generate(tokenUser));
             }
 
@@ -112,9 +113,10 @@ namespace DSP_API.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] AccountRegister accountRegister)
         {
+            System.Console.WriteLine("da vo");
             if (!_let.CheckNumberLetter(accountRegister.UserName) || !_let.CheckNumberLetter(accountRegister.PassWord))
             {
-                return BadRequest("0. only letter and number are accept");
+                return BadRequest("only letter and number are accept");
             }
             if (!ModelState.IsValid)
             {
@@ -122,11 +124,11 @@ namespace DSP_API.Controllers
             }
             if (accountRegister.PassWord != accountRegister.RePass)
             {
-                return BadRequest("0. Repass is different from");
+                return BadRequest("Repass is different from");
             }
             if (_context.Users.Any(u => u.Username == accountRegister.UserName))
             {
-                return BadRequest("0. The username is already exists");
+                return BadRequest("The username is already exists");
 
             }
             var newUser = new User()
@@ -147,7 +149,7 @@ namespace DSP_API.Controllers
             _UserId = 0;
             _Username = "";
             _UserRole = "";
-            return Ok("1. Logout success");
+            return Ok("Logout success");
         }
         private string Generate(User? user)
         {
@@ -160,8 +162,10 @@ namespace DSP_API.Controllers
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, string.Concat(user.Roles.Select(x => x.Name).ToList())),
                 new Claim("id",user.Id.ToString()),
-                new Claim("userName",user.Username),
+                new Claim("userName",user.Username),  
                 new Claim("name",user.Name),
+                new Claim("img",user.Img),
+                new Claim ("email",user.Email== null?"":user.Email),
                 new Claim("roles",string.Concat(user.Roles.Select(x => x.Name).ToList()) )
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims, expires: DateTime.Now.AddDays(30), signingCredentials: credentials);

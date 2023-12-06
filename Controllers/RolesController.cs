@@ -65,13 +65,13 @@ namespace DSP_API.Controllers
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
             if (role == null)
             {
-                return BadRequest("0. Role is not exitst");
+                return BadRequest("Role is not exitst");
             };
             role.Name = roleCreate.Name;
     
             await _context.SaveChangesAsync();
 
-            return Ok("1. Update successfully");
+            return Ok("Update successfully");
         }
 
         // POST: api/Roles
@@ -94,7 +94,7 @@ namespace DSP_API.Controllers
             _context.Roles.Add(role);
             await _context.SaveChangesAsync();
             // return CreatedAtAction("GetRole", new { id = role.Id }, role);
-            return Ok("1. Create successfully");
+            return Ok("Create successfully");
 
         }
 
@@ -115,7 +115,7 @@ namespace DSP_API.Controllers
             _context.Roles.Remove(role);
             await _context.SaveChangesAsync();
 
-            return Ok("1. Delete successfully");
+            return Ok("Delete successfully");
         }
         [HttpGet]
         public async Task<IActionResult> GetRoleByUserId(int userId)
@@ -123,7 +123,7 @@ namespace DSP_API.Controllers
             var user = await _context.Users.Where(u => u.Id == userId).Include(u => u.Roles).FirstOrDefaultAsync();
             if (user == null)
             {
-                return BadRequest("0. Khong co user");
+                return BadRequest("Khong co user");
             }
             var listRole = user.Roles.Select(r => r.Name).ToList();
             return Ok(listRole);
@@ -134,21 +134,21 @@ namespace DSP_API.Controllers
             var user = await _context.Users.Where(u => u.Id == userId).Include(u => u.Roles).FirstOrDefaultAsync();
             if (user == null)
             {
-                return BadRequest("0. Khong co user");
+                return BadRequest("Khong co user");
             }
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
 
             if (role == null)
             {
-                return BadRequest("0. Role is null");
+                return BadRequest("Role is null");
             }
             if (user.Roles.Contains(role))
             {
-                return BadRequest("0. Role is exitst");
+                return BadRequest("Role is exitst");
             }
             user.Roles.Add(role);
             await _context.SaveChangesAsync();
-            return Ok("1. Add role successfully");
+            return Ok("Add role successfully");
         }
         [HttpDelete]
         public async Task<IActionResult> DeleteUserRole(int userId, int roleId)
@@ -156,21 +156,21 @@ namespace DSP_API.Controllers
             var user = await _context.Users.Where(u => u.Id == userId).Include(u => u.Roles).FirstOrDefaultAsync();
             if (user == null)
             {
-                return BadRequest("0. Khong co user");
+                return BadRequest("Khong co user");
             }
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
 
             if (role == null)
             {
-                return BadRequest("0. Role is null");
+                return BadRequest("Role is null");
             }
             if (!user.Roles.Contains(role))
             {
-                return BadRequest("0. Role is not exitst");
+                return BadRequest("Role is not exitst");
             }
             user.Roles.Remove(role);
             await _context.SaveChangesAsync();
-            return Ok("1. Remove role successfully");
+            return Ok("Remove role successfully");
         }
         private bool RoleExists(int id)
         {

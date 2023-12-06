@@ -37,11 +37,11 @@ namespace DSP_API.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
-                return BadRequest("0. User is null");
+                return BadRequest("User is null");
             }
             user.BanEnabled = !user.BanEnabled;
             await _context.SaveChangesAsync();
-            return Ok("1. Ban revert successfully");
+            return Ok("Ban revert successfully");
         }
         [HttpPut]
         public async Task<IActionResult> BanBox(int boxId)
@@ -49,11 +49,11 @@ namespace DSP_API.Controllers
             var box = await _context.Boxs.FirstOrDefaultAsync(b => b.Id == boxId);
             if (box == null)
             {
-                return BadRequest("0. Box is not exists");
+                return BadRequest("Box is not exists");
             }
             box.AdminBan = !box.AdminBan;
             await _context.SaveChangesAsync();
-            return Ok("0. BanBox successfully");
+            return Ok("BanBox successfully");
         }
         [HttpGet]
         public async Task<IActionResult> GetALLBox()
@@ -68,7 +68,7 @@ namespace DSP_API.Controllers
         {
             if (!_UserRole.Contains("Edit"))
             {
-                return BadRequest("0. You have not permisstion");
+                return BadRequest("You have not permisstion");
             }
             var boxs = await _context.Boxs.Where(b => b.UserId == Id).ToListAsync();
             return Ok(boxs);

@@ -122,11 +122,11 @@ namespace DSP_API.Controllers
             var box = await _context.Boxs.Where(b => b.Id == boxId).FirstOrDefaultAsync();
             if (box == null)
             {
-                return BadRequest("0. box is null");
+                return BadRequest("box is null");
             }
             if (box.UserId != _UserId)
             {
-                return BadRequest("0. You have not permission");
+                return BadRequest("You have not permission");
             }
             var listUserShare = _context.BoxShares.Where(b => b.BoxId == boxId).Select(bs => new { bs.User.Id, bs.User.Img, bs.User.Name, bs.EditAccess });
             return Ok(listUserShare);
@@ -150,7 +150,7 @@ namespace DSP_API.Controllers
             
             if (box == null || user == null)
             {
-                return BadRequest("0. Box or User is null|");
+                return BadRequest("Box or User is null|");
             }
             if (box.UserId == user.Id)
             {
@@ -159,11 +159,11 @@ namespace DSP_API.Controllers
             var listBoxShare = _context.BoxShares.Where(bs => bs.BoxId == boxId);
             if (!IsAuth(box.UserId))
             {
-                return BadRequest("0. You have not permission");
+                return BadRequest("You have not permission");
             }
             if (listBoxShare.Any(l => l.UserId == user.Id))
             {
-                return BadRequest("0. User is already exists ");
+                return BadRequest("User is already exists ");
             };
             var boxShare = new BoxShare()
             {
@@ -173,7 +173,7 @@ namespace DSP_API.Controllers
             };
             _context.Add(boxShare);
             await _context.SaveChangesAsync();
-            return Ok("1. Successfully");
+            return Ok("Successfully");
         }
         [HttpDelete]
         [IsLogin()]
@@ -184,21 +184,21 @@ namespace DSP_API.Controllers
 
             if (box == null || user == null)
             {
-                return BadRequest("0. Box or User is null|");
+                return BadRequest("Box or User is null|");
             }
             var listBoxShare = _context.BoxShares.Where(bs => bs.BoxId == boxId);
             if (!IsAuth(box.UserId))
             {
-                return BadRequest("0. You have not permission");
+                return BadRequest("You have not permission");
             }
             if (!listBoxShare.Any(l => l.UserId == user.Id))
             {
-                return BadRequest("0. User have not been exists ");
+                return BadRequest("User have not been exists ");
             };
             var boxShare = await _context.BoxShares.FirstOrDefaultAsync(b => b.UserId == user.Id && b.BoxId == boxId);
             _context.Remove(boxShare);
             await _context.SaveChangesAsync();
-            return Ok("1. Successfully");
+            return Ok("Successfully");
         }
         [HttpGet]
         [IsLogin]

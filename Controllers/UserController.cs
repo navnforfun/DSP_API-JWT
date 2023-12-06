@@ -46,15 +46,15 @@ namespace DSP_API.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == _UserId);
             if (user == null)
             {
-                return BadRequest("0. Something went wrong");
+                return BadRequest("Something went wrong");
             }
             if (Img == null)
             {
-                return BadRequest("0. Img is null");
+                return BadRequest("Img is null");
             }
             if (!Img.ContentType.Contains("image"))
             {
-                return BadRequest("0. The file is not image");
+                return BadRequest("The file is not image");
             }
             if (user.Img != "/Uploads/Defaults/avtuser.jpg")
             {
@@ -66,7 +66,7 @@ namespace DSP_API.Controllers
 
             user.Img = $"Uploads/{_Username}/{Img.FileName}";
             await _context.SaveChangesAsync();
-            return Ok("1. Successfully");
+            return Ok("Successfully");
         }
         [IsLogin()]
         [HttpPut]
@@ -75,13 +75,13 @@ namespace DSP_API.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == _UserId);
             if (user == null)
             {
-                return BadRequest("0. Something went wrong");
+                return BadRequest("Something went wrong");
             }
             user.Name = userInfo.Name;
             user.JobTitle = userInfo.JobTitle;
             user.Description = userInfo.Description;
             await _context.SaveChangesAsync();
-            return Ok("1. Successfully");
+            return Ok("Successfully");
         }
         [HttpPut]
         [IsLogin()]
@@ -94,14 +94,14 @@ namespace DSP_API.Controllers
             }
             if (user.Password != rePass.PassOld)
             {
-                return BadRequest("0. You pass is wrong");
+                return BadRequest("You pass is wrong");
             }
             if (rePass.PassNew1 != rePass.PassNew2)
             {
-                return BadRequest("0. Repass is wrong");
+                return BadRequest("Repass is wrong");
             }
 
-            return Ok("1. Successfully");
+            return Ok("Successfully");
         }
         private async Task<IActionResult> UploadFile(IFormFile file, string path)
         {
@@ -119,13 +119,13 @@ namespace DSP_API.Controllers
             {
                 uploadedFile.CopyTo(localFile);
             }
-            return Ok("1. Success");
+            return Ok("Success");
         }
 
         private async Task<IActionResult> DeleteFileAsync(string path)
         {
             System.IO.File.Delete(path);
-            return Ok("1. Delete successfully");
+            return Ok("Delete successfully");
 
         }
 

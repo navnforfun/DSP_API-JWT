@@ -87,7 +87,7 @@ namespace DSP_API.Controllers
             }
             if (box.AdminBan == true)
             {
-                return BadRequest("0. The box id baned by admin");
+                return BadRequest("The box id baned by admin");
             }
 
 
@@ -96,7 +96,7 @@ namespace DSP_API.Controllers
                 var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId).ToArray();
                 if (!listUserShare.Contains(_UserId) && !(box.UserId == _UserId))
                 {
-                    return BadRequest("0. The box is not available");
+                    return BadRequest("The box is not available");
 
                 }
             }
@@ -118,7 +118,7 @@ namespace DSP_API.Controllers
 
             if (updateBox == null)
             {
-                return BadRequest("0. The box is not exists");
+                return BadRequest("The box is not exists");
             }
 
             if (updateBox.UserId != _UserId)
@@ -178,18 +178,18 @@ namespace DSP_API.Controllers
             var box = await _context.Boxs.FirstOrDefaultAsync(b => b.Id == boxId);
             if (box == null)
             {
-                return BadRequest("0. Box is null");
+                return BadRequest("Box is null");
             }
 
             if (box.AdminBan == true)
             {
-                return BadRequest("0. Box is ban by admin");
+                return BadRequest("Box is ban by admin");
             }
             if (box.SharedStatus == false)
             {
                 if (!IsAuth(box.UserId) && !IsInShare(box))
                 {
-                    return BadRequest("0. Box is not available");
+                    return BadRequest("Box is not available");
 
                 }
             }
@@ -270,7 +270,7 @@ namespace DSP_API.Controllers
             {
                 uploadedFile.CopyTo(localFile);
             }
-            return Ok("1. Success");
+            return Ok("Success");
         }
 
         [HttpPost]
@@ -281,7 +281,7 @@ namespace DSP_API.Controllers
 
             if (box == null)
             {
-                return BadRequest("0. The box is not exists");
+                return BadRequest("The box is not exists");
             }
             if (!IsAuth(box.UserId) && !IsInShareEdit(box))
             {
@@ -316,7 +316,7 @@ namespace DSP_API.Controllers
             {
                 uploadedFile.CopyTo(localFile);
             }
-            return Ok("1. Success");
+            return Ok("Success");
         }
         [HttpDelete]
         [IsLogin()]
@@ -326,7 +326,7 @@ namespace DSP_API.Controllers
 
             if (box == null)
             {
-                return BadRequest("0. The box is not exists");
+                return BadRequest("The box is not exists");
             }
 
             var file = await _context.Files.FirstOrDefaultAsync(f => f.Id == Id);
@@ -334,7 +334,7 @@ namespace DSP_API.Controllers
             System.IO.File.Delete(path);
             _context.Files.Remove(file);
             await _context.SaveChangesAsync();
-            return Ok("1. Delete successfully");
+            return Ok("Delete successfully");
 
         }
         [HttpDelete]
@@ -345,7 +345,7 @@ namespace DSP_API.Controllers
             var box = await _context.Boxs.Where(b => b.Id == boxId).Include(b => b.User).FirstOrDefaultAsync();
             if (box == null)
             {
-                return BadRequest("0. The box is not exitsts");
+                return BadRequest("The box is not exitsts");
             }
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", box.User.Username, box.Url);
@@ -358,7 +358,7 @@ namespace DSP_API.Controllers
             }
             _context.Remove(box);
             await _context.SaveChangesAsync();
-            return Ok("1. Delete successfully");
+            return Ok("Delete successfully");
 
         }
 

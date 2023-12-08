@@ -353,7 +353,7 @@ namespace DSP_API.Controllers
             {
                 System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(path);
 
-                Empty(directory);
+                Empty(directory);it
                 Directory.Delete(path);
             }
             _context.Remove(box);

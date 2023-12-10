@@ -146,7 +146,7 @@ namespace DSP_API.Controllers
         }
         [IsAdmin]
         [HttpPost]
-        public IActionResult RegisterAdmin([FromForm] AccountByAdmin account)
+        public IActionResult AdminCreateAccount([FromForm] AccountByAdmin account)
         {
             if (!ModelState.IsValid)
             {

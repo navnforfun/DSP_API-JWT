@@ -125,7 +125,7 @@ namespace DSP_API.Controllers
             {
                 if (IsInShareEdit(updateBox))
                 {
-                    return BadRequest("You have not permission");
+                    return BadRequest("Bạn không có quyền");
                 }
             }
             if (!ModelState.IsValid)

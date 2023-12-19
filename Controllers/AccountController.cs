@@ -142,6 +142,8 @@ namespace DSP_API.Controllers
             };
             _context.Add(newUser);
             _context.SaveChanges();
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", accountRegister.UserName);
+            Directory.CreateDirectory(path);
             return Ok(newUser);
         }
         [IsAdmin]
@@ -168,6 +170,8 @@ namespace DSP_API.Controllers
             };
             _context.Add(newUser);
             _context.SaveChanges();
+              string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", account.UserName);
+            Directory.CreateDirectory(path);
             return Ok(newUser);
         }
         [HttpGet]
@@ -231,9 +235,7 @@ namespace DSP_API.Controllers
         [Required(ErrorMessage = "Empty {0}")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
         public string PassWord { get; set; }
-           [Required(ErrorMessage = "Empty {0}")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Longer than {1} and smaller than {2}")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 
 }

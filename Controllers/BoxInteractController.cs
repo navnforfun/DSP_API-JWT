@@ -128,7 +128,7 @@ namespace DSP_API.Controllers
             {
                 return BadRequest("You have not permission");
             }
-            var listUserShare = _context.BoxShares.Where(b => b.BoxId == boxId).Select(bs => new { bs.User.Id, bs.User.Img, bs.User.Name, bs.EditAccess });
+            var listUserShare = _context.BoxShares.Where(b => b.BoxId == boxId).Select(bs => new { bs.User.Id,bs.User.Username, bs.User.Img, bs.User.Name, bs.EditAccess });
             return Ok(listUserShare);
         }
 

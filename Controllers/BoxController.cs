@@ -123,7 +123,7 @@ namespace DSP_API.Controllers
 
             if (updateBox.UserId != _UserId)
             {
-                if (IsInShareEdit(updateBox))
+                if (!IsInShareEdit(updateBox))
                 {
                     return BadRequest("Bạn không có quyền");
                 }

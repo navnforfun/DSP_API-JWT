@@ -144,7 +144,7 @@ namespace DSP_API.Controllers
                 }
                 string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", updateBox.User.Username, updateBox.Url, "avt");
                 await UploadFile(Img, path);
-                updateBox.Img = $"Uploads/{_Username}/{updateBox.Url}/avt/{Img.FileName}";
+                updateBox.Img = $"Uploads/{updateBox.User.Username}/{updateBox.Url}/avt/{Img.FileName}";
                 
             }
 

@@ -1,9 +1,0 @@
-- Hoỉ về ID truyền vào trong các controller
-- Kỳ sau sẽ học chuyên ngành gì
-- Điều cần chú ý khi làm form
-
-
-- Hỏi về API - REST REST FULL
-- Điều cần chú ý khi viết api
-- API có gì đặc biệt
-- Dụng mvc thường viết api thì sao

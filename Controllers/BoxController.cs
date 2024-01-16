@@ -28,8 +28,21 @@ namespace DSP_API.Controllers
         }
         [HttpPost]
         [IsLogin()]
-        public async Task<IActionResult> CreateBox([FromForm] BoxCreate boxCreate, IEnumerable<IFormFile>? Files, IFormFile? Img)
+        public async Task<IActionResult> TestC([FromForm] BoxCreate? boxCreate)
         {
+            Console.WriteLine("Da nhan");
+            foreach (var f in boxCreate.myFiles)
+            {
+
+                System.Console.WriteLine(f);
+            }
+            return Ok(boxCreate);
+        }
+        [HttpPost,DisableRequestSizeLimit, RequestFormLimits(MultipartBodyLengthLimit = Int32.MaxValue, ValueLengthLimit = Int32.MaxValue)]
+        [IsLogin()]
+        public async Task<IActionResult> CreateBox([FromForm] BoxCreate boxCreate, IFormFile? Img)
+        {
+          
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -60,12 +73,14 @@ namespace DSP_API.Controllers
             };
             await _context.AddAsync(newBox);
             await _context.SaveChangesAsync();
-            foreach (var f in Files)
+            if(boxCreate.myFiles != null){
+                foreach (var f in boxCreate.myFiles)
             {
 
                 await UploadBoxFile(f, newBox.Id);
             }
 
+            }
             var boxDto = _mapper.Map<BoxDto>(newBox);
             return Ok(boxDto);
         }
@@ -74,7 +89,8 @@ namespace DSP_API.Controllers
         public async Task<IActionResult> GetBoxsCurrentUser()
         {
             var boxs = await _context.Boxs.Where(b => b.UserId == _UserId).ToListAsync();
-            return Ok(boxs);
+            var listBoxsDto = _mapper.Map<List<BoxDto>>(boxs);
+            return Ok(listBoxsDto);
         }
 
         [HttpGet]
@@ -96,6 +112,9 @@ namespace DSP_API.Controllers
                 var listUserShare = _context.BoxShares.Where(b => b.BoxId == box.Id).Select(b => b.UserId).ToArray();
                 if (!listUserShare.Contains(_UserId) && !(box.UserId == _UserId))
                 {
+                    Console.WriteLine(_UserId);
+                    Console.WriteLine(box.UserId);
+
                     return BadRequest("The box is not available");
 
                 }
@@ -112,7 +131,7 @@ namespace DSP_API.Controllers
         [IsLogin()]
         public async Task<IActionResult> UpdateBox(int Id, [FromForm] BoxCreate boxUpdate, IFormFile? Img)
         {
-
+  Console.WriteLine(boxUpdate.Content);
             var updateBox = await _context.Boxs.Where(b => b.Id == Id).Include(b => b.User).FirstOrDefaultAsync();
 
 
@@ -273,7 +292,7 @@ namespace DSP_API.Controllers
             return Ok("Success");
         }
 
-        [HttpPost]
+        [HttpPost,DisableRequestSizeLimit, RequestFormLimits(MultipartBodyLengthLimit = Int32.MaxValue, ValueLengthLimit = Int32.MaxValue)]
         [IsLogin()]
         public async Task<IActionResult> UploadBoxFile(IFormFile file, int boxId)
         {
@@ -320,7 +339,7 @@ namespace DSP_API.Controllers
         }
         [HttpDelete]
         [IsLogin()]
-        public async Task<IActionResult> DeleteFileAsync(int Id, int boxId, string fileName, string userName)
+        public async Task<IActionResult> DeleteFileAsync(int Id, int boxId, string fileName)
         {
             var box = await _context.Boxs.Where(b => b.Id == boxId).Include(b => b.User).FirstOrDefaultAsync();
 
@@ -330,7 +349,7 @@ namespace DSP_API.Controllers
             }
 
             var file = await _context.Files.FirstOrDefaultAsync(f => f.Id == Id);
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", userName, box.Url, fileName);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", box.User.Username, box.Url, fileName);
             System.IO.File.Delete(path);
             _context.Files.Remove(file);
             await _context.SaveChangesAsync();
@@ -413,7 +432,7 @@ namespace DSP_API.Controllers
         public string Title { get; set; }
         [Required(ErrorMessage = "Empty {0}")]
         public string? Content { get; set; }
-
+        public List<IFormFile>? myFiles {get;set;}
         public bool? SharedStatus { get; set; }
 
     }
